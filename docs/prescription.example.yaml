@@ -1,0 +1,4 @@
+user_name_map:
+    jenkins:    'buildserver'
+    gitlab:     'repository'
+    nerdy:      'nerdy.programmer'
