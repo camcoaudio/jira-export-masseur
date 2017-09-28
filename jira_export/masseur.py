@@ -188,9 +188,11 @@ class Masseur(object):
         content = bytes(content, 'utf-8')
         entities = parse(BytesIO(content), parser=self._PARSER)
 
-        for attr in ['author',
+        for attr in ['assignee',
+                     'author',
                      'authorKey',
                      'caller',
+                     'childName',
                      'creator',
                      'deltaFrom',
                      'deltaTo',
@@ -203,9 +205,12 @@ class Masseur(object):
                      'oldvalue',
                      'owner',
                      'roletypeparameter',
+                     'reporter',
                      'sourceName',
                      'updateauthor',
                      'user',
+                     'userKey',
+                     'userName',
                      'username']:
             _update_attributes(entities, attr)
         for attr in ['author',
