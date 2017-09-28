@@ -131,7 +131,7 @@ class Masseur(object):
             in_path:    path to the XML file to read from
             out_path:   path to the XML file to write to
         """
-        def _update_children(root, name):
+        def _update_element_text(root, name):
             for elem in root.findall('.//' + name):
                 if elem.text not in self.user_name_map.keys():
                     continue
@@ -139,8 +139,19 @@ class Masseur(object):
 
         config = parse(in_path, parser=self._PARSER)
 
+        # Transform simple username mentions
         for elem in ['administratorUser', 'author', 'lead', 'memberUser', 'owner', 'username']:
-            _update_children(config, elem)
+            _update_element_text(config, elem)
+
+        # Transform username mentions in filter names
+        filter_elements = [config.findall('.//' + name) for name in ['mainFilter', 'value']]
+        filter_elements = [item for sublist in filter_elements for item in sublist]
+        filter_elements = [elem for elem in filter_elements if elem.text and '@@' in elem.text]
+        for elem in filter_elements:
+            for username in self.user_name_map:
+                if username not in elem.text:
+                    continue
+                elem.text = sub(username + '(?=@@)', self.user_name_map[username], elem.text)
 
         with open(out_path, 'w') as config_xml:
             config_xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
