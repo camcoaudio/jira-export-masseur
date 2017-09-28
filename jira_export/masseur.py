@@ -1,7 +1,21 @@
-#!/usr/bin/env python3
-"""A script that takes a JIRA Project Configurator export and makes modifications."""
+# Copyright 2017 Sebastian Neuser
+#
+# This file is part of jira_export_masseur.
+#
+# jira_export_masseur is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# jira_export_masseur is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with jira_export_masseur. If not, see <http://www.gnu.org/licenses/>.
+"""JIRA Project Configurator export masseur main logic."""
 
-from argparse import ArgumentParser
 from io import BytesIO
 from os import unlink
 from re import sub
@@ -10,7 +24,6 @@ from tempfile import mkdtemp
 from zipfile import ZipFile
 
 from lxml.etree import XMLParser, parse, tostring
-from yaml import safe_load
 
 
 class Masseur(object):
@@ -41,6 +54,8 @@ class Masseur(object):
 
 
     def __exit__(self, exc_type, exc_value, traceback):
+        if self.debug:
+            return
         rmtree(self.workspace_path())
 
 
@@ -129,7 +144,7 @@ class Masseur(object):
 
         with open(out_path, 'w') as config_xml:
             config_xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-            config_xml.write(tostring(config, encoding=str))
+            config_xml.write(tostring(config, encoding='unicode'))
 
 
     def update_entities(self, in_path, out_path):
@@ -211,36 +226,3 @@ class Masseur(object):
         if path is None:
             return self._workspace
         return self._workspace + '/' + path
-
-
-def parse_cmdline():
-    """Parses command line arguments given to the script.
-
-    Returns:
-        the command line arguments parsed by argparse
-    """
-    parser = ArgumentParser(description=globals()['__doc__'])
-    parser.add_argument('-c', '--config', default='prescription.yaml',
-                        help='a JIRA project export zip file')
-    parser.add_argument('-d', '--debug', action='store_true',
-                        help='do not overwrite input files (default: False)')
-    parser.add_argument('file', help='a JIRA project export zip file')
-    return parser.parse_args()
-
-
-def main():
-    """Program entry point.
-    """
-    args = parse_cmdline()
-
-    # Load config
-    with open(args.config) as conf_file:
-        data = conf_file.read()
-        config = safe_load(data)
-
-    masseur = Masseur(config['user_name_map'], args.debug)
-    masseur.massage(args.file)
-
-
-if __name__ == "__main__":
-    main()
