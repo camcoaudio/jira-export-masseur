@@ -140,7 +140,13 @@ class Masseur(object):
         config = parse(in_path, parser=self._PARSER)
 
         # Transform simple username mentions
-        for elem in ['administratorUser', 'author', 'lead', 'memberUser', 'owner', 'username']:
+        for elem in ['administratorUser',
+                     'author',
+                     'componentLead',
+                     'lead',
+                     'memberUser',
+                     'owner',
+                     'username']:
             _update_element_text(config, elem)
 
         # Transform username mentions in filter names
