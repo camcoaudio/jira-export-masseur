@@ -26,4 +26,4 @@ In its easiest form you can call the script like this::
     $ massage-jira-export project-dump.zip
 
 The script is configured with a YAML file. You can find an example configuration at
-`docs/prescription.example.yaml`_.
+`docs/prescription.example.yaml <docs/prescription.example.yaml>`_.
